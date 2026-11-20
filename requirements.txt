@@ -1,5 +1,6 @@
 pandas
 matplotlib
+plotly
 groq
 python-dotenv
 pydantic-settings
