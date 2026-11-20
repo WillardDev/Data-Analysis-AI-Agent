@@ -1,10 +1,19 @@
+PY ?= .venv/bin/python
+export PYTHONPATH := src
+
+.PHONY: install test eval run docker
+
 install:
-	pip install -r requirements.txt
+	$(PY) -m pip install -r requirements.txt
+
 test:
-	pytest tests/
+	$(PY) -m pytest tests/ -q
+
 eval:
-	python evals/run_evals.py data/sales.csv
+	$(PY) evals/run_evals.py data/sales.csv
+
 run:
-	python -m agent.main data/sales.csv "$(Q)"
+	$(PY) -m agent.main data/sales.csv "$(Q)"
+
 docker:
 	docker compose run --rm agent data/sales.csv "$(Q)"
