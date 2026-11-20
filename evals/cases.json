@@ -1,0 +1,4 @@
+[
+  {"question": "How many rows are in the data?", "expected": "1000"},
+  {"question": "What is the total revenue?", "expected": "52340.5"}
+]
