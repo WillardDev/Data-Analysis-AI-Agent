@@ -65,7 +65,7 @@ Everything goes through the `Makefile`, which uses `.venv/bin/python` so you nev
 
 `make run` and `make docker` require a question; without `Q` they print usage and exit instead of calling the API with an empty prompt.
 
-You can also work in `AI_Agent.ipynb`, which builds the project layer by layer. Its cells use `%%writefile` to generate the real files on disk, so running it top to bottom reproduces this repository.
+You can also work in `AI_Agent.ipynb`, which builds the project layer by layer. Its cells use `%%writefile` to generate the real files on disk, so running it top to bottom regenerates the source, config, Docker, and CI files.
 
 ## Configuration
 
