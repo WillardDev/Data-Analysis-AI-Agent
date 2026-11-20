@@ -16,7 +16,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python -m py_compile app.py src/agent/*.py
+      - run: python -m py_compile app.py src/agent/*.py dashboard/*.py
       - run: pytest tests/ -q
 
   docker:

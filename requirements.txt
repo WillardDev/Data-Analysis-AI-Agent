@@ -2,8 +2,12 @@ pandas
 matplotlib
 plotly
 kaleido
+pillow
 groq
 streamlit>=1.50
+openpyxl
+fpdf2
+tableauhyperapi; sys_platform == "linux" and platform_machine == "x86_64"
 python-dotenv
 pydantic-settings
 duckdb
