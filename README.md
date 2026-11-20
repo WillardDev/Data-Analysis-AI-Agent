@@ -62,10 +62,46 @@ Everything goes through the `Makefile`, which uses `.venv/bin/python` so you nev
 | `make eval` | Run the evaluation cases against `data/sales.csv` |
 | `make run Q="..."` | Ask one question from the terminal |
 | `make docker Q="..."` | Same, inside the container |
+| `make ui` | Launch the Streamlit app at http://localhost:8501 |
+| `make docker-ui` | Launch the Streamlit app in Docker |
 
 `make run` and `make docker` require a question; without `Q` they print usage and exit instead of calling the API with an empty prompt.
 
 You can also work in `AI_Agent.ipynb`, which builds the project layer by layer. Its cells use `%%writefile` to generate the real files on disk, so running it top to bottom regenerates the source, config, Docker, and CI files.
+
+## User Interface
+
+`app.py` is a Streamlit front end for people who do not write code.
+
+**Locally**
+
+```bash
+make ui            # http://localhost:8501
+```
+
+**Docker**
+
+```bash
+make docker-ui     # builds the image and serves on http://localhost:8501
+# or: docker compose up ui
+```
+
+The app reuses `src/agent` unchanged: it calls `ask()` and reads the JSONL trace the observability layer already writes, so no agent logic is duplicated.
+
+**Sidebar** — CSV upload, a data preview (row count, column count, dtypes, missing values), starter questions generated from your column names, **Clear conversation**, and a **Show the code the agent wrote** toggle (off by default).
+
+**Main area** — a chat transcript. Each answer leads with the finding, then an interactive Plotly chart with PNG download (HTML fallback if a static renderer is unavailable), then a collapsed **How I got this** section with the code and raw output.
+
+| State | What the user sees |
+|---|---|
+| No file uploaded | "Upload a CSV in the sidebar to get started"; chat input disabled |
+| Working | Status line: *Analysing* → *Writing and running code* → *Preparing chart* |
+| Error or step limit | "I couldn't answer that reliably…"; tracebacks stay inside the expander |
+| File over 25 MB | Warning; only a summary and three sample rows are sent to the model |
+| Follow-up question | The same history is reused, so "now break that down by region" works |
+| Export | Per-chart PNG download and a full conversation as Markdown |
+
+**Safety** — the API key is read from `.env` and never rendered; uploads are held in memory only and never written to disk; Docker is the isolation boundary for `exec()`; every question, code step, error, latency, and token count still lands in `logs/agent.jsonl`. A permanent note reminds users that answers are AI-generated.
 
 ## Configuration
 
@@ -165,6 +201,7 @@ No secrets are needed — the workflow uses the automatic `GITHUB_TOKEN` with `p
 ## Project Structure
 
 ```
+app.py              Streamlit UI (upload, chat, charts, export)
 src/agent/
   agent.py          the tool-calling loop
   tools.py          run_python sandbox-ish executor, plotly chart helper
@@ -185,6 +222,7 @@ Makefile            install / test / eval / run / docker
 - **Language:** Python 3.12 (Docker image); 3.10+ locally
 - **Model:** `openai/gpt-oss-120b` via the [Groq](https://console.groq.com/keys) API
 - **Data:** pandas, plotly
+- **UI:** Streamlit
 - **Config:** python-dotenv, pydantic-settings
 - **Quality:** pytest, GitHub Actions
 - **Packaging:** Docker
@@ -209,11 +247,11 @@ The agent executes code that the model writes. In a personal notebook with data 
 ## Roadmap
 
 - [x] Plotly charts with HTML output
+- [x] Streamlit UI with upload, chat, chart export, and Markdown reports
 - [x] Docker image and compose setup
 - [x] JSONL observability
 - [x] CI with tests, Docker build, and tagged releases
 - [ ] SQL tool (DuckDB) so the agent can choose between pandas and SQL
-- [ ] File upload widget for non-technical users
 - [ ] Data-cleaning tool that describes its changes before applying them
 - [ ] Larger evaluation set with real expected answers
 - [ ] Hosted observability (Langfuse or LangSmith)
