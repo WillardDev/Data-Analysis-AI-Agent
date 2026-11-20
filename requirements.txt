@@ -1,0 +1,7 @@
+pandas
+matplotlib
+groq
+python-dotenv
+pydantic-settings
+duckdb
+pytest
